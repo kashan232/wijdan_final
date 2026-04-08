@@ -276,3 +276,15 @@
 
 
 @endsection
+        $('#discount, #extra_cost').on('input', recalcSummary);
+
+        // --- Initialize ---
+        $('tbody tr').each(function() {
+            recalcRow($(this));
+        });
+        recalcSummary();
+    });
+</script>
+
+
+@endsection

@@ -218,7 +218,8 @@ class SaleController extends Controller
                 "recordsTotal" => $totalRecords,
                 "recordsFiltered" => $filteredRecords,
                 "data" => $data,
-                "totalFilteredSale" => $totalFilteredSale
+                "totalFilteredSale" => $totalFilteredSale,
+                "todaySales" => Sale::where('user_id', auth()->id())->whereDate('created_at', date('Y-m-d'))->sum('total_bill_amount')
             ]);
         }
         $openingBalance = \App\Models\UserOpeningBalance::where('user_id', auth()->id())
@@ -231,7 +232,7 @@ class SaleController extends Controller
             ->whereDate('created_at', date('Y-m-d'))
             ->sum('total_bill_amount');
 
-        $netCash = $openingBalance + $todaySales;
+        $netCash = $openingBalance;
 
         return view('admin_panel.sale.index', compact('openingBalance', 'todaySales', 'netCash'));
     }
@@ -1191,13 +1192,89 @@ class SaleController extends Controller
     }
 
 
-    public function salereturnview()
+    public function salereturnview(Request $request)
     {
-        // Fetch all sale returns with the original sale and customer info
-        $salesReturns = SalesReturn::with('sale.customer_relation')->orderBy('created_at', 'desc')->get();
-        return view('admin_panel.sale.return.index', [
-            'salesReturns' => $salesReturns,
-        ]);
+        if ($request->ajax()) {
+            $query = SalesReturn::with(['sale.customer_relation', 'sale.user']);
+
+            // 🔹 User Filtering (Consistency with Sales Page)
+            if (auth()->id() !== 1 && !auth()->user()->hasRole('Admin')) {
+                $query->whereHas('sale', function ($q) {
+                    $q->where('user_id', auth()->id());
+                });
+            }
+
+            // 🔹 Date Filtering
+            if ($request->filled('from_date')) {
+                $query->whereDate('created_at', '>=', $request->from_date);
+            }
+            if ($request->filled('to_date')) {
+                $query->whereDate('created_at', '<=', $request->to_date);
+            }
+
+            // 🔹 Search Filter
+            if ($request->has('search') && !empty($request->search['value'])) {
+                $search = $request->search['value'];
+                $query->where(function ($q) use ($search) {
+                    $q->where('sale_id', 'like', "%{$search}%")
+                        ->orWhere('customer', 'like', "%{$search}%")
+                        ->orWhere('reference', 'like', "%{$search}%")
+                        ->orWhere('product', 'like', "%{$search}%")
+                        ->orWhere('product_code', 'like', "%{$search}%")
+                        ->orWhere('total_net', 'like', "%{$search}%")
+                        ->orWhere('total_bill_amount', 'like', "%{$search}%")
+                        ->orWhereHas('sale', function ($s) use ($search) {
+                            $s->where('invoice_no', 'like', "%{$search}%")
+                                ->orWhereHas('customer_relation', function ($c) use ($search) {
+                                    $c->where('customer_name', 'like', "%{$search}%");
+                                });
+                        });
+                });
+            }
+
+            $totalRecords = SalesReturn::count();
+            $filteredRecords = $query->count();
+
+            // 🔹 Pagination
+            $skip = $request->start ?? 0;
+            $take = $request->length ?? 10;
+            
+            $returns = $query->orderBy('created_at', 'desc')
+                ->skip($skip)->take($take)->get();
+
+            $data = [];
+            foreach ($returns as $index => $item) {
+                $products = explode(',', $item->product ?? '');
+                $prodHtml = '';
+                foreach ($products as $p) {
+                    if (!empty($p)) {
+                        $prodHtml .= '<span class="badge bg-light text-dark border mb-1">' . trim($p) . '</span><br>';
+                    }
+                }
+
+                $data[] = [
+                    $skip + $index + 1, // S.No
+                    $item->sale->invoice_no ?? 'N/A',
+                    $prodHtml,
+                    $item->sale->customer_relation->customer_name ?? 'Walk-in Customer',
+                    $item->total_items,
+                    '<span class="fw-bold">' . number_format($item->total_net, 2) . '</span>',
+                    $item->return_note,
+                    $item->created_at->format('d-m-Y'),
+                    '<span class="badge bg-danger">Returned</span>',
+                    '<a href="' . route('saleReturn.invoice', $item->id) . '" target="_blank" class="btn btn-sm btn-info text-white">Receipt</a>'
+                ];
+            }
+
+            return response()->json([
+                "draw" => intval($request->draw),
+                "recordsTotal" => $totalRecords,
+                "recordsFiltered" => $filteredRecords,
+                "data" => $data
+            ]);
+        }
+
+        return view('admin_panel.sale.return.index');
     }
 
     public function saleinvoice($id)

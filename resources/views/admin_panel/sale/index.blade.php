@@ -14,17 +14,21 @@
                 <h5 class="mb-0">SALES</h5>
                 @if(auth()->user()->hasRole('Cashier'))
                 <div class="badge bg-success fs-6 p-2 shadow-sm">
-                    Opening Cash: {{ $fmt($openingBalance ?? 0) }}
+                    Opening Cash: <span id="openingCashVal">{{ $fmt($openingBalance ?? 0) }}</span>
                 </div>
                 <div class="badge bg-primary fs-6 p-2 shadow-sm">
-                    Today's Sale: {{ $fmt($todaySales ?? 0) }}
+                    Today's Sale: <span id="todaySaleVal">{{ $fmt($todaySales ?? 0) }}</span>
                 </div>
-                <div class="badge bg-dark fs-6 p-2 shadow-sm border border-light">
-                    Net Cash: {{ $fmt($netCash ?? 0) }}
-                </div>
-                <div class="badge bg-info fs-6 p-2 shadow-sm border border-light d-none" id="filteredSaleCard">
+                <div class="badge bg-success fs-6 p-2 shadow-sm border border-light" id="filteredSaleCard">
                     Sale: <span id="filteredSaleAmount">0</span>
                 </div>
+                <div class="badge bg-dark fs-6 p-2 shadow-sm border border-light">
+                    Net Cash: <span id="netCashAmount">{{ $fmt($netCash ?? 0) }}</span>
+                </div>
+
+                {{-- Hidden values for JS calculation --}}
+                <input type="hidden" id="openingBalanceRaw" value="{{ $openingBalance ?? 0 }}">
+                <input type="hidden" id="todaySaleRaw" value="{{ $todaySales ?? 0 }}">
                 @endif
             </div>
             <div>
@@ -187,19 +191,35 @@
                 var api = this.api();
                 var json = api.ajax.json();
                 
+                function formatNum(num) {
+                    if (num === null || num === undefined) return "0";
+                    num = parseFloat(num);
+                    return (num % 1 === 0) ? num.toLocaleString(undefined, {minimumFractionDigits: 0}) : num.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                }
+
+                if (json && json.todaySales !== undefined) {
+                    $('#todaySaleVal').text(formatNum(json.todaySales));
+                    $('#todaySaleRaw').val(json.todaySales);
+                }
+
                 if (json && json.totalFilteredSale !== undefined) {
-                    var total = parseFloat(json.totalFilteredSale);
-                    var formattedTotal = (total % 1 === 0) ? total.toLocaleString(undefined, {minimumFractionDigits: 0}) : total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                    var opening = parseFloat($('#openingBalanceRaw').val()) || 0;
+                    var todaySale = parseFloat($('#todaySaleRaw').val()) || 0;
                     
                     var fromDate = $('#filterFrom').val();
                     var toDate = $('#filterTo').val();
+                    var filterUser = $('#filterUser').val();
+                    var searchVal = api.search();
                     
-                    if(fromDate || toDate) {
-                        $('#filteredSaleAmount').text(formattedTotal);
-                        $('#filteredSaleCard').removeClass('d-none');
-                    } else {
-                        $('#filteredSaleCard').addClass('d-none');
+                    var filteredTotal = 0;
+                    if (fromDate || toDate || filterUser || searchVal) {
+                        filteredTotal = parseFloat(json.totalFilteredSale);
                     }
+                    
+                    var netCash = opening + filteredTotal;
+                    
+                    $('#filteredSaleAmount').text(formatNum(filteredTotal));
+                    $('#netCashAmount').text(formatNum(netCash));
                 }
             }
         });
