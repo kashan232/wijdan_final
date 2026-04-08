@@ -373,3 +373,4 @@ Route::middleware('auth')->group(function () {
     route::post('/Brand/manual', [ManuallController::class, 'brand'])->name("manual.Brand");
 });
 require __DIR__ . '/auth.php';
+require __DIR__ . '/hr.php';

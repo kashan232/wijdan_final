@@ -246,11 +246,56 @@
                                     </ul>
                                 </div>
 
-
                             </div>
                         </div>
                     </li>
 
+                    <!-- HR Management Menu -->
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="menu_icon fas fa-users"></i>
+                            <span class="menu-title">HR</span>
+                            <i class="menu-arrow"></i>
+                        </a>
+                        <div class="submenu">
+                            <ul class="submenu-item">
+                                @can('hr.employees.view')
+                                <li class="nav-item"><a class="nav-link" href="{{ route('hr.employees.index') }}"><i class="fas fa-user-friends mr-2"></i> <span class="menu-title">Employees</span></a></li>
+                                @endcan
+                                @can('hr.attendance.view')
+                                <li class="nav-item"><a class="nav-link" href="{{ route('hr.attendance.index') }}"><i class="fas fa-calendar-check mr-2"></i> <span class="menu-title">Attendance</span></a></li>
+                                @endcan
+                                @can('hr.payroll.view')
+                                <li class="nav-item"><a class="nav-link" href="{{ route('hr.payroll.index') }}"><i class="fas fa-money-check-alt mr-2"></i> <span class="menu-title">Payroll</span></a></li>
+                                @endcan
+                                @can('hr.leaves.view')
+                                <li class="nav-item"><a class="nav-link" href="{{ route('hr.leaves.index') }}"><i class="fas fa-calendar-minus mr-2"></i> <span class="menu-title">Leaves</span></a></li>
+                                @endcan
+                                @can('hr.loans.view')
+                                <li class="nav-item"><a class="nav-link" href="{{ route('hr.loans.index') }}"><i class="fas fa-hand-holding-usd mr-2"></i> <span class="menu-title">Loans</span></a></li>
+                                @endcan
+                                @can('hr.departments.view')
+                                <li class="nav-item"><a class="nav-link" href="{{ route('hr.departments.index') }}"><i class="fas fa-sitemap mr-2"></i> <span class="menu-title">Departments</span></a></li>
+                                @endcan
+                                @can('hr.designations.view')
+                                <li class="nav-item"><a class="nav-link" href="{{ route('hr.designations.index') }}"><i class="fas fa-user-tag mr-2"></i> <span class="menu-title">Designations</span></a></li>
+                                @endcan
+                                @can('hr.shifts.view')
+                                <li class="nav-item"><a class="nav-link" href="{{ route('hr.shifts.index') }}"><i class="fas fa-clock mr-2"></i> <span class="menu-title">Shifts</span></a></li>
+                                @endcan
+                                @can('hr.holidays.view')
+                                <li class="nav-item"><a class="nav-link" href="{{ route('hr.holidays.index') }}"><i class="fas fa-umbrella-beach mr-2"></i> <span class="menu-title">Holidays</span></a></li>
+                                @endcan
+                                @can('hr.salary.structure.view')
+                                <li class="nav-item"><a class="nav-link" href="{{ route('hr.salary-structure.index') }}"><i class="fas fa-file-invoice-dollar mr-2"></i> <span class="menu-title">Salary Structure</span></a></li>
+                                @endcan
+                                @can('hr.biometric.devices.view')
+                                <li class="nav-item"><a class="nav-link" href="{{ route('hr.biometric-devices.index') }}"><i class="fas fa-fingerprint mr-2"></i> <span class="menu-title">Biometric Devices</span></a></li>
+                                @endcan
+                                <li class="nav-item"><a class="nav-link" href="{{ route('my-attendance') }}"><i class="fas fa-user-clock mr-2"></i> <span class="menu-title">My Attendance</span></a></li>
+                            </ul>
+                        </div>
+                    </li>
 
                     <!-- Vouchers Menu -->
                     <li class="nav-item">
