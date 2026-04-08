@@ -225,9 +225,8 @@
         }
     </style>
 
-    <div class="main-content">
-        <div class="main-content-inner">
-            <div class="container">
+    <div class="container-fluid py-4">
+
                 <!-- Page Header -->
                 <div class="page-header d-flex justify-content-between align-items-start">
                     <div>
@@ -361,11 +360,11 @@
                         class="d-flex flex-wrap gap-3 align-items-end">
                         <div style="flex: 1; min-width: 200px;">
                             <label class="form-label text-muted small fw-bold">DATE</label>
-                            <input type="date" name="date" class="form-control" value="{{ $selectedDate }}">
+                            <input type="date" name="date" class="form-control" value="{{ $selectedDate }}" onchange="this.form.submit()">
                         </div>
                         <div style="flex: 1; min-width: 200px;">
                             <label class="form-label text-muted small fw-bold">DEPARTMENT</label>
-                            <select name="department_id" class="form-select">
+                            <select name="department_id" class="form-select" onchange="this.form.submit()">
                                 <option value="">All Departments</option>
                                 @foreach ($departments as $dept)
                                     <option value="{{ $dept->id }}"
@@ -377,7 +376,7 @@
                         </div>
                         <div style="flex: 1; min-width: 200px;">
                             <label class="form-label text-muted small fw-bold">DESIGNATION</label>
-                            <select name="designation_id" class="form-select">
+                            <select name="designation_id" class="form-select" onchange="this.form.submit()">
                                 <option value="">All Designations</option>
                                 @foreach ($designations as $desig)
                                     <option value="{{ $desig->id }}"
@@ -389,7 +388,7 @@
                         </div>
                         <div style="flex: 1; min-width: 150px;">
                             <label class="form-label text-muted small fw-bold">STATUS</label>
-                            <select name="status" class="form-select">
+                            <select name="status" class="form-select" onchange="this.form.submit()">
                                 <option value="">All Status</option>
                                 <option value="present" {{ $selectedStatus == 'present' ? 'selected' : '' }}>Present
                                 </option>
@@ -398,10 +397,12 @@
                                 <option value="leave" {{ $selectedStatus == 'leave' ? 'selected' : '' }}>Leave</option>
                             </select>
                         </div>
-                        <div>
+                        <div class="d-none">
                             <button type="submit" class="btn btn-primary"><i class="fa fa-filter me-1"></i>
                                 Apply</button>
-                            <a href="{{ route('hr.attendance.index') }}" class="btn btn-light border"><i
+                        </div>
+                        <div>
+                            <a href="{{ route('hr.attendance.index') }}" class="btn btn-light border" title="Clear Filters"><i
                                     class="fa fa-sync"></i></a>
                         </div>
                     </form>
@@ -691,13 +692,12 @@
                         </div>
                     @endcan
                 </form>
-            </div>
-        </div>
     </div>
-
 @endsection
 
 @section('scripts')
+
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         function showSaveBar(element) {

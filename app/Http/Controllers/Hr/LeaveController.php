@@ -96,7 +96,7 @@ class LeaveController extends Controller
         }
 
         return response()->json([
-            'success'      => 'Leave request submitted successfully.' . $balanceMsg,
+            'success'      => "🌴 <b>Request Submitted!</b><br>Leave application for <b>{$employee->full_name}</b> has been received." . ($balanceMsg ? "<br><small class='text-muted'>{$balanceMsg}</small>" : ""),
             'force_deduct' => $forceDeduct,
             'reload'       => true,
         ]);
@@ -111,7 +111,7 @@ class LeaveController extends Controller
         $leave->update(['status' => $request->status]);
 
         return response()->json([
-            'success' => 'Leave status updated.',
+            'success' => "✅ <b>Status Updated!</b><br>Leave request status changed to <b>" . ucfirst($request->status) . "</b>.",
             'reload'  => true,
         ]);
     }
@@ -139,7 +139,7 @@ class LeaveController extends Controller
         $leave->update(['deduct_salary' => ! $leave->deduct_salary]);
 
         return response()->json([
-            'success'       => 'Leave deduction updated.',
+            'success'       => "🔄 <b>Deduction Settings Updated!</b><br>Salary deduction for this leave has been " . ($leave->fresh()->deduct_salary ? 'enabled' : 'disabled') . ".",
             'deduct_salary' => $leave->fresh()->deduct_salary,
         ]);
     }

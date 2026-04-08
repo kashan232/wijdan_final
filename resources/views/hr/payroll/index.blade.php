@@ -751,9 +751,8 @@
         }
     </style>
 
-    <div class="main-content">
-        <div class="main-content-inner">
-            <div class="container">
+    <div class="container-fluid py-4">
+
                 <!-- Page Header -->
                 <div
                     class="page-header d-flex justify-content-between align-items-center bg-white p-4 rounded-3 shadow-sm mb-4 border-start border-4 border-primary">
@@ -766,7 +765,7 @@
                         @can('hr.payroll.create')
                             <div class="dropdown">
                                 <button class="btn btn-primary px-4 py-2 dropdown-toggle shadow-sm rounded-pill fw-bold"
-                                    type="button" id="generateDropdown" data-bs-toggle="dropdown" aria-expanded="false"
+                                    type="button" id="generateDropdown" data-toggle="dropdown" aria-expanded="false"
                                     style="background: linear-gradient(135deg, #6366f1, #4f46e5); border: none;">
                                     <i class="fa fa-plus-circle me-1"></i> Generate Payroll
                                 </button>
@@ -1340,7 +1339,37 @@
                                             </div>
                                         </div>
 
+                                        <!-- Daily: Deduction Rules + Carry Forward (shown only for daily payrolls) -->
+                                        <div class="erp-field-group d-none" id="erp_daily_deduction_section">
+                                            <!-- Carry Forward From Previous Day -->
+                                            <div id="erp_carry_forward_from_prev" class="d-none mb-2 p-2 rounded" style="background:#fff1f2;border:1px dashed #fecaca;">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <div class="erp-label text-danger fw-700"><i class="fa fa-history me-1"></i> Carried Forward (Prev. Day)</div>
+                                                        <div class="erp-description" style="font-size:0.72rem;">Unpaid deduction from a previous payroll</div>
+                                                    </div>
+                                                    <span class="fw-bold text-danger text-nowrap ms-2" id="erp_carried_forward_amount">Rs. 0.00</span>
+                                                </div>
+                                            </div>
+                                            <!-- Itemized Deduction Rules -->
+                                            <div id="erp_deduction_rules_section" class="d-none">
+                                                <label class="erp-label d-block mb-2 fw-700"><i class="fa fa-list-ul me-1"></i> Deduction Rules Applied</label>
+                                                <div id="erp_deduction_rules_list" class="vstack gap-1" style="max-height:140px; overflow-y:auto; scrollbar-width:thin;"></div>
+                                            </div>
+                                            <!-- Carry Forward To Next Day -->
+                                            <div id="erp_carry_forward_to_next_box" class="d-none mt-2 p-2 rounded" style="background:#fffbeb;border:1px dashed #fde68a;">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <div class="erp-label text-warning fw-700"><i class="fa fa-forward me-1"></i> Carry Forward (Next Day)</div>
+                                                        <div class="erp-description" style="font-size:0.72rem;">Exceeds today's wage — deducted in next payroll</div>
+                                                    </div>
+                                                    <span class="fw-bold text-warning text-nowrap ms-2" id="erp_carry_forward_to_next_amount">Rs. 0.00</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         <!-- Attendance Summary Pattern -->
+
                                         <div class="erp-field-group mt-2">
                                             <label class="erp-label d-block mb-1">Attendance Summary Pattern</label>
                                             <div class="d-flex justify-content-between align-items-center bg-white p-2 rounded border shadow-xs">
@@ -1474,7 +1503,9 @@
             </div>
         </div>
     </div>
+</div>
 @endsection
+
 
 @section('scripts')
     <script>
@@ -1523,22 +1554,31 @@
                 $('#payrollCount').text($('.payroll-card:visible').length + ' payrolls');
             }
 
-            // Generate payroll modal
-            $('#generateBtn').click(function() {
-                $('#generatePayrollForm')[0].reset();
-                $('#generatePayrollModal').modal('show');
+            // Generate payroll modal (Resilient delegated handler)
+            $(document).on('click', '#generateBtn', function(e) {
+                e.preventDefault();
+                var modal = $('#generatePayrollModal');
+                var form = $('#generatePayrollForm');
+                if (form.length > 0) form[0].reset();
+                modal.modal('show');
             });
 
-            // Generate monthly modal
-            $('#generateMonthlyBtn').click(function() {
-                $('#generateMonthlyModal').find('form')[0].reset();
-                $('#generateMonthlyModal').modal('show');
+            // Generate monthly modal (Resilient delegated handler)
+            $(document).on('click', '#generateMonthlyBtn', function(e) {
+                e.preventDefault();
+                var modal = $('#generateMonthlyModal');
+                var form = modal.find('form');
+                if (form.length > 0) form[0].reset();
+                modal.modal('show');
             });
 
-            // Generate daily modal
-            $('#generateDailyBtn').click(function() {
-                $('#generateDailyForm')[0].reset();
-                $('#generateDailyModal').modal('show');
+            // Generate daily modal (Resilient delegated handler)
+            $(document).on('click', '#generateDailyBtn', function(e) {
+                e.preventDefault();
+                var modal = $('#generateDailyModal');
+                var form = $('#generateDailyForm');
+                if (form.length > 0) form[0].reset();
+                modal.modal('show');
             });
 
             // Payroll type change
@@ -1768,40 +1808,77 @@
                                                         <span class="text-muted small fw-bold text-uppercase">Total Deduction</span>
                                                         <span class="text-danger fw-bold fs-6">Rs. ${parseFloat(data.attendance_breakdown.total_deduction || 0).toFixed(2)}</span>
                                                     </div>
-                                                    
+
+                                                    <!-- Daily Wage Rate Chip -->
+                                                    <div class="d-flex justify-content-between align-items-center mb-3 p-2 rounded" style="background:#f0fdf4;border:1px solid #bbf7d0;">
+                                                        <span class="small text-success fw-bold"><i class="fa fa-coins me-1"></i> Daily Wage Rate</span>
+                                                        <span class="small text-success fw-bold">Rs. ${parseFloat(data.payroll.basic_salary || 0).toFixed(2)}</span>
+                                                    </div>
+
                                                     ${data.attendance_breakdown.has_data ? `
-                                                                                                        <div class="d-flex justify-content-between gap-3">
-                                                                                                            <div class="text-center p-2 rounded bg-white border ${data.attendance_breakdown.is_late ? 'border-warning apple-glow-warning' : 'border-light'} flex-fill">
-                                                                                                                <div class="small text-muted mb-1">Check In</div>
-                                                                                                                ${data.attendance_breakdown.late_deduction_amount > 0 ? `
-                                                                    <div class="text-danger fw-bold small mb-1">-Rs. ${parseFloat(data.attendance_breakdown.late_deduction_amount).toFixed(2)}</div>
-                                                                ` : ''}
-                                                                                                                <div class="fw-bold ${data.attendance_breakdown.is_late ? 'text-warning' : 'text-dark'}">
-                                                                                                                    ${data.attendance_breakdown.check_in || '--:--'}
-                                                                                                                </div>
-                                                                                                                ${data.attendance_breakdown.is_late ? `
-                                                                    <div class="badge bg-warning text-dark mt-1" style="font-size: 0.7rem;">Late (${data.attendance_breakdown.late_minutes}m)</div>
-                                                                ` : ''}
-                                                                                                            </div>
-                                                                                                            
-                                                                                                            <div class="text-center p-2 rounded bg-white border ${data.attendance_breakdown.is_early_out ? 'border-info apple-glow-info' : 'border-light'} flex-fill">
-                                                                                                                <div class="small text-muted mb-1">Check Out</div>
-                                                                                                                ${data.attendance_breakdown.early_deduction_amount > 0 ? `
-                                                                    <div class="text-danger fw-bold small mb-1">-Rs. ${parseFloat(data.attendance_breakdown.early_deduction_amount).toFixed(2)}</div>
-                                                                ` : ''}
-                                                                                                                <div class="fw-bold ${data.attendance_breakdown.is_early_out ? 'text-info' : 'text-dark'}">
-                                                                                                                    ${data.attendance_breakdown.check_out || '--:--'}
-                                                                                                                </div>
-                                                                                                                ${data.attendance_breakdown.is_early_out ? `
-                                                                    <div class="badge bg-info text-white mt-1" style="font-size: 0.7rem;">Early (${data.attendance_breakdown.early_checkout_minutes}m)</div>
-                                                                ` : ''}
-                                                                                                            </div>
-                                                                                                        </div>
-                                                                                                    ` : `
-                                                                                                        <div class="text-center text-muted small py-2">
-                                                                                                            <i class="fa fa-exclamation-circle"></i> No attendance record
-                                                                                                        </div>
-                                                                                                    `}
+                                                        <div class="d-flex justify-content-between gap-3 mb-3">
+                                                            <div class="text-center p-2 rounded bg-white border ${data.attendance_breakdown.is_late ? 'border-warning apple-glow-warning' : 'border-light'} flex-fill">
+                                                                <div class="small text-muted mb-1">Check In</div>
+                                                                ${data.attendance_breakdown.late_deduction_amount > 0 ? `<div class="text-danger fw-bold small mb-1">-Rs. ${parseFloat(data.attendance_breakdown.late_deduction_amount).toFixed(2)}</div>` : ''}
+                                                                <div class="fw-bold ${data.attendance_breakdown.is_late ? 'text-warning' : 'text-dark'}">${data.attendance_breakdown.check_in || '--:--'}</div>
+                                                                ${data.attendance_breakdown.is_late ? `<div class="badge bg-warning text-dark mt-1" style="font-size:0.7rem;">Late (${data.attendance_breakdown.late_minutes}m)</div>` : ''}
+                                                            </div>
+                                                            <div class="text-center p-2 rounded bg-white border ${data.attendance_breakdown.is_early_out ? 'border-info apple-glow-info' : 'border-light'} flex-fill">
+                                                                <div class="small text-muted mb-1">Check Out</div>
+                                                                ${data.attendance_breakdown.early_deduction_amount > 0 ? `<div class="text-danger fw-bold small mb-1">-Rs. ${parseFloat(data.attendance_breakdown.early_deduction_amount).toFixed(2)}</div>` : ''}
+                                                                <div class="fw-bold ${data.attendance_breakdown.is_early_out ? 'text-info' : 'text-dark'}">${data.attendance_breakdown.check_out || '--:--'}</div>
+                                                                ${data.attendance_breakdown.is_early_out ? `<div class="badge bg-info text-white mt-1" style="font-size:0.7rem;">Early (${data.attendance_breakdown.early_checkout_minutes}m)</div>` : ''}
+                                                            </div>
+                                                        </div>
+                                                    ` : `
+                                                        <div class="text-center text-muted small py-2 mb-3">
+                                                            <i class="fa fa-exclamation-circle"></i> No attendance record for this day
+                                                        </div>
+                                                    `}
+
+                                                    <!-- Itemized Deduction Rules -->
+                                                    ${data.deduction_details && data.deduction_details.length > 0 ? `
+                                                        <div class="mb-3">
+                                                            <div class="small fw-bold text-muted text-uppercase mb-2" style="font-size:0.68rem;letter-spacing:0.05em;">
+                                                                <i class="fa fa-list-ul me-1"></i> Deduction Rules Applied
+                                                            </div>
+                                                            ${data.deduction_details.map(d => `
+                                                                <div class="d-flex justify-content-between align-items-start py-2 border-bottom" style="font-size:0.82rem;">
+                                                                    <div>
+                                                                        <div class="text-dark"><i class="fa fa-minus-circle text-danger me-1" style="font-size:0.7rem;"></i>${d.name}</div>
+                                                                        ${d.description ? `<div class="text-muted" style="font-size:0.72rem;margin-top:2px;">${d.description}</div>` : ''}
+                                                                    </div>
+                                                                    <span class="text-danger fw-bold ms-2 text-nowrap">-Rs. ${parseFloat(d.amount).toFixed(2)}</span>
+                                                                </div>
+                                                            `).join('')}
+                                                        </div>
+                                                    ` : (data.attendance_breakdown.has_data && parseFloat(data.attendance_breakdown.total_deduction || 0) === 0 ? `
+                                                        <div class="text-center text-success small py-2 mb-3">
+                                                            <i class="fa fa-check-circle me-1"></i> No deductions — Full day rate applies
+                                                        </div>
+                                                    ` : '')}
+
+                                                    <!-- Carry Forward From Previous Day -->
+                                                    ${parseFloat(data.breakdown.deductions.carried_forward || 0) > 0 ? `
+                                                        <div class="p-2 rounded d-flex justify-content-between align-items-start mb-2" style="background:#fff1f2;border:1px dashed #fecaca;">
+                                                            <div>
+                                                                <div class="small text-danger fw-bold"><i class="fa fa-history me-1"></i> Carried Forward (Previous Day)</div>
+                                                                <div class="text-muted" style="font-size:0.72rem;">Unpaid deduction carried from a previous payroll</div>
+                                                            </div>
+                                                            <span class="small text-danger fw-bold text-nowrap ms-2">-Rs. ${parseFloat(data.breakdown.deductions.carried_forward).toFixed(2)}</span>
+                                                        </div>
+                                                    ` : ''}
+
+                                                    <!-- Carry Forward To Next Day -->
+                                                    ${parseFloat(data.breakdown.deductions.carried_forward_to_next || 0) > 0 ? `
+                                                        <div class="p-2 rounded d-flex justify-content-between align-items-start" style="background:#fffbeb;border:1px dashed #fde68a;">
+                                                            <div>
+                                                                <div class="small text-warning fw-bold"><i class="fa fa-forward me-1"></i> Carry Forward (To Next Day)</div>
+                                                                <div class="text-muted" style="font-size:0.72rem;">Exceeds today's wage — will deduct in next payroll</div>
+                                                            </div>
+                                                            <span class="small text-warning fw-bold text-nowrap ms-2">Rs. ${parseFloat(data.breakdown.deductions.carried_forward_to_next).toFixed(2)}</span>
+                                                        </div>
+                                                    ` : ''}
                                                 </div>
                                             ` : `
                                                 <!-- Monthly Payroll View -->
@@ -2070,7 +2147,8 @@
 
                     // Header Info
                     $('#erp_emp_designation').text(p.employee?.designation?.name || 'Employee');
-                    $('#erp_payroll_month').text(p.month + ' ' + p.year);
+                    const periodDisplay = p.payroll_type === 'daily' ? p.month : (p.month + ' ' + (p.year || ''));
+                    $('#erp_payroll_month').text(periodDisplay);
                     $('#erp_payroll_type').text(p.payroll_type + ' Payroll');
 
                     // Earnings Section
@@ -2257,6 +2335,53 @@
                         absentContainer.append('<div class="text-center py-2 bg-white rounded border border-dashed text-slate-400 small">No attendance deductions found</div>');
                     }
 
+                    // Daily Payroll: Carry Forward + Deduction Rules
+                    const dailySection = $('#erp_daily_deduction_section');
+                    if (p.payroll_type === 'daily') {
+                        dailySection.removeClass('d-none');
+
+                        // Carry Forward FROM Previous Day
+                        const carriedFwd = parseFloat((data.breakdown && data.breakdown.deductions && data.breakdown.deductions.carried_forward) || 0);
+                        if (carriedFwd > 0) {
+                            $('#erp_carried_forward_amount').text(`Rs. ${carriedFwd.toLocaleString(undefined, {minimumFractionDigits: 2})}`);
+                            $('#erp_carry_forward_from_prev').removeClass('d-none');
+                        } else {
+                            $('#erp_carry_forward_from_prev').addClass('d-none');
+                        }
+
+                        // Itemized Deduction Rules
+                        const rulesList = $('#erp_deduction_rules_list');
+                        rulesList.empty();
+                        if (data.deduction_details && data.deduction_details.length > 0) {
+                            $('#erp_deduction_rules_section').removeClass('d-none');
+                            data.deduction_details.forEach(function(d) {
+                                const descHtml = d.description ? `<div style="font-size:0.72rem;" class="text-muted mt-1">${d.description}</div>` : '';
+                                rulesList.append(
+                                    `<div class="d-flex justify-content-between align-items-start p-2 bg-white rounded border mb-1" style="font-size:0.8rem;">
+                                        <div>
+                                            <div class="fw-bold text-dark"><i class="fa fa-minus-circle text-danger me-1" style="font-size:0.7rem;"></i>${d.name}</div>
+                                            ${descHtml}
+                                        </div>
+                                        <span class="text-danger fw-bold ms-2 text-nowrap">-Rs. ${parseFloat(d.amount).toFixed(2)}</span>
+                                    </div>`
+                                );
+                            });
+                        } else {
+                            $('#erp_deduction_rules_section').addClass('d-none');
+                        }
+
+                        // Carry Forward TO Next Day
+                        const carriedToNext = parseFloat((data.breakdown && data.breakdown.deductions && data.breakdown.deductions.carried_forward_to_next) || 0);
+                        if (carriedToNext > 0) {
+                            $('#erp_carry_forward_to_next_amount').text(`Rs. ${carriedToNext.toLocaleString(undefined, {minimumFractionDigits: 2})}`);
+                            $('#erp_carry_forward_to_next_box').removeClass('d-none');
+                        } else {
+                            $('#erp_carry_forward_to_next_box').addClass('d-none');
+                        }
+                    } else {
+                        dailySection.addClass('d-none');
+                    }
+
                     $('#erp_attendance_summary_pattern').text(stats.attendance_summary_pattern);
 
                     // Calculations
@@ -2264,6 +2389,7 @@
 
                     // Show Modal
                     $('#payrollPayModal').modal('show');
+
                 });
             });
 

@@ -137,7 +137,10 @@ class EmployeeController extends Controller
         \Cache::forget('employee.face_encodings');
         \Cache::forget('hr.employees.active.lite');
 
-        return response()->json(['success' => 'Employee saved successfully', 'reload' => true]);
+        return response()->json([
+            'success' => "👤 <b>Success!</b><br>Employee <b>'{$request->first_name} {$request->last_name}'</b> has been ".($request->filled('edit_id') ? 'updated' : 'created')." successfully.",
+            'reload' => true
+        ]);
     }
 
     public function destroy(Employee $employee)
@@ -153,7 +156,10 @@ class EmployeeController extends Controller
         $employee->leaves()->where('leave_type', 'Casual')->delete();
         $employee->delete();
 
-        return response()->json(['success' => 'Employee deleted successfully', 'reload' => true]);
+        return response()->json([
+            'success' => "🗑️ <b>Deleted!</b><br>Employee <b>'{$employee->full_name}'</b> (ID: #{$employee->id}) and all related records have been removed.",
+            'reload' => true
+        ]);
     }
 
     /**
@@ -291,7 +297,7 @@ class EmployeeController extends Controller
         \Cache::forget('employee.face_encodings');
 
         return response()->json([
-            'success' => 'Face registered successfully for '.$employee->full_name,
+            'success' => "📸 <b>Face Registered!</b><br>Biometric face profile for <b>{$employee->full_name}</b> has been saved successfully.",
             'was_override' => $request->force_override ?? false,
         ]);
     }

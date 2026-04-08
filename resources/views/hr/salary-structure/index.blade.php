@@ -192,9 +192,8 @@
         }
     </style>
 
-    <div class="main-content">
-        <div class="main-content-inner">
-            <div class="container">
+    <div class="container-fluid py-4">
+
                 <!-- Page Header -->
                 <div class="page-header d-flex justify-content-between align-items-start">
                     <div>
@@ -210,7 +209,8 @@
 
                 <!-- Stats Row -->
                 @php
-                    $totalStructures = \App\Models\Hr\SalaryStructure::count();
+                    // Only count "Base" structures to match the grid (Templates + Standalone Employee ones)
+                    $totalStructures = \App\Models\Hr\SalaryStructure::whereNull('parent_structure_id')->count();
                     $totalAssignments = \App\Models\Hr\Employee::has('activeSalaryStructure')->count();
                     $unassignedEmployees = \App\Models\Hr\Employee::where('status', 'active')
                         ->whereDoesntHave('activeSalaryStructure')
@@ -258,6 +258,11 @@
                                     <div style="flex: 1;">
                                         <h3 class="structure-title">
                                             {{ $structure->name }}
+                                            @if($structure->employee_id)
+                                                <span class="badge bg-soft-info text-info border border-info border-opacity-25 ms-2" style="font-size: 0.65rem; font-weight: 700; text-transform: uppercase;">
+                                                    <i class="fa fa-user me-1"></i> Individual
+                                                </span>
+                                            @endif
                                             @if ($structure->salary_type == 'both')
                                                 @if ($structure->use_daily_wages)
                                                     <span class="structure-type-badge">Monthly + Comm. + Daily</span>
@@ -392,13 +397,12 @@
                         </div>
                     @endif
                 </div>
-            </div>
-        </div>
     </div>
+@endsection
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+@section('scripts')
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 
     <script>
         function createNewStructure() {

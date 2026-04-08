@@ -415,8 +415,8 @@ class SalaryStructureAssignmentController extends Controller
             DB::commit();
 
             return response()->json([
-                'success' => 'Individual salary structure updated successfully.',
-                'redirect' => route('hr.salary-structure.view-assigned', $newStructure->id), // Or back to list
+                'success' => "👤 <b>Update Complete!</b><br>Individual structure for <b>{$employee->full_name}</b> has been updated and set as active.",
+                'redirect' => route('hr.salary-structure.view-assigned', $newStructure->id),
             ]);
 
         } catch (\Exception $e) {

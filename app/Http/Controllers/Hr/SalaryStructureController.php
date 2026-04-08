@@ -23,9 +23,8 @@ class SalaryStructureController extends Controller
         }
 
         // Fetch salary structures with assigned employee counts
-        // Show only Templates (no parent, no specific employee)
+        // Show only Base Structures: Templates OR Standalone Employee Structures (no parent)
         $structures = SalaryStructure::whereNull('parent_structure_id')
-            ->whereNull('employee_id')
             ->withCount(['assignedEmployees as assigned_count'])
             ->with(['children' => function ($query) {
                 $query->select('id', 'parent_structure_id')->withCount('assignedEmployees as assigned_count');
@@ -142,7 +141,7 @@ class SalaryStructureController extends Controller
         ]);
 
         return response()->json([
-            'success' => 'Salary Structure Created Successfully',
+            'success' => "✅ <b>Success!</b><br>Salary Structure <b>'{$request->name}'</b> has been created. You can now assign this template to employees.",
             'redirect' => route('hr.salary-structure.index'),
         ]);
     }
@@ -293,7 +292,7 @@ class SalaryStructureController extends Controller
             DB::commit();
 
             return response()->json([
-                'success' => 'Salary Structure Updated Successfully'.($hasAssignments ? ' (Changes applied to all assigned employees).' : ''),
+                'success' => "🔄 <b>Structure Updated!</b><br>Changes to <b>'{$request->name}'</b> have been saved." . ($hasAssignments ? "<br><small class='text-info'>Note: Changes were automatically applied to all assigned employees.</small>" : ""),
                 'redirect' => route('hr.salary-structure.index'),
             ]);
 
@@ -330,7 +329,7 @@ class SalaryStructureController extends Controller
         $salaryStructure->delete();
 
         return response()->json([
-            'success' => 'Salary Structure Template Deleted Successfully',
+            'success' => "🗑️ <b>Deleted!</b><br>The salary structure template <b>'{$salaryStructure->name}'</b> has been removed from the system.",
             'redirect' => route('hr.salary-structure.index'),
         ]);
     }
@@ -477,7 +476,7 @@ class SalaryStructureController extends Controller
         );
 
         return response()->json([
-            'success' => 'Salary Structure '.($hasSalaryStructure ? 'Updated' : 'Created').' Successfully',
+            'success' => "✅ <b>Structure ".($hasSalaryStructure ? 'Updated' : 'Assigned')."!</b><br>The salary configurations for <b>{$employee->full_name}</b> have been saved successfully.",
             'redirect' => route('hr.salary-structure.index'),
         ]);
     }

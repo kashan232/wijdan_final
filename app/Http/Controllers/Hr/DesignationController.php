@@ -42,7 +42,7 @@ class DesignationController extends Controller
             $designation = Designation::findOrFail($request->edit_id);
             $designation->update($data);
             return response()->json([
-                'success' => 'Designation Updated Successfully',
+                'success' => "💼 <b>Updated!</b><br>Designation <b>'{$request->name}'</b> has been updated successfully.",
                 'reload' => true
             ]);
         } else {
@@ -51,7 +51,7 @@ class DesignationController extends Controller
             }
             Designation::create($data);
             return response()->json([
-                'success' => 'Designation Created Successfully',
+                'success' => "💼 <b>Success!</b><br>New designation <b>'{$request->name}'</b> has been created.",
                 'reload' => true
             ]);
         }
@@ -69,7 +69,7 @@ class DesignationController extends Controller
 
         $designation->delete();
         return response()->json([
-            'success' => 'Designation Deleted Successfully',
+            'success' => "🗑️ <b>Deleted!</b><br>Designation <b>'{$designation->name}'</b> has been removed from the system.",
             'reload' => true
         ]);
     }

@@ -71,9 +71,8 @@
         }
     </style>
 
-    <div class="main-content">
-        <div class="main-content-inner">
-            <div class="container">
+    <div class="container-fluid py-4">
+
                 <!-- Page Header -->
                 <div class="page-header d-flex justify-content-between align-items-start">
                     <div>
@@ -198,9 +197,8 @@
                         {{ $holidays->links() }}
                     </div>
                 </div>
-            </div>
-        </div>
     </div>
+
 
     <!-- Modal -->
     <div class="modal fade" id="holidayModal" tabindex="-1" aria-hidden="true">
@@ -366,7 +364,10 @@
         </div>
     </div>
 
+@endsection
+
 @section('scripts')
+
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>

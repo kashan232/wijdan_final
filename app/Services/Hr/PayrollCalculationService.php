@@ -160,8 +160,9 @@ class PayrollCalculationService
             $dateStr = $current->format('Y-m-d');
             $att = $attendancesByDate->get($dateStr);
 
-            // Check day status (supports multiple off days like "Monday,Tuesday")
-            $offDays = $employee->weekly_off ? array_map('trim', explode(',', strtolower($employee->weekly_off))) : ['sunday'];
+            // Check day status (supports multiple off days and JSON format like '["Friday"]')
+            $cleanOffStr = $employee->weekly_off ? str_replace(['[', ']', '"', "'"], '', strtolower($employee->weekly_off)) : 'sunday';
+            $offDays = array_map('trim', explode(',', $cleanOffStr));
             $isWeeklyOff = in_array(strtolower($current->format('l')), $offDays);
 
             $isHoliday = Holiday::isHoliday($dateStr, $employee->id);
@@ -393,10 +394,11 @@ class PayrollCalculationService
         $workingDays = 0;
         $current = $startDate->copy();
 
-        // Get employee off days (default to Sunday if not set)
+        // Get employee off days (default to Sunday if not set). Strip JSON brackets if stored as json.
         $offDays = ['sunday'];
         if ($employee && $employee->weekly_off) {
-            $offDays = array_map('trim', explode(',', strtolower($employee->weekly_off)));
+            $cleanOffStr = str_replace(['[', ']', '"', "'"], '', strtolower($employee->weekly_off));
+            $offDays = array_map('trim', explode(',', $cleanOffStr));
         }
 
         while ($current->lte($endDate)) {
@@ -512,10 +514,28 @@ class PayrollCalculationService
         $policy = $structure->attendance_deduction_policy ?? [];
         $carryForward = $structure->carry_forward_deductions ?? false;
 
-        // Start with the daily rate
-        $dayEarning = $dailyRate;
         $dayDeduction = 0;
         $deductionDetails = [];
+
+        // Handle attendance status for earnings and absence deductions
+        if ($attendance->status === 'absent') {
+            $dayEarning = 0;
+            
+            // Check for absence penalty in policy
+            $absencePenalty = $policy['absence_penalty_per_instance'] ?? $policy['absence_penalty'] ?? 0;
+            if ($absencePenalty > 0) {
+                $dayDeduction += $absencePenalty;
+                $deductionDetails[] = [
+                    'name' => 'Absence Penalty',
+                    'amount' => $absencePenalty,
+                    'description' => 'Penalty for unauthorized absence on ' . Carbon::parse($attendance->date)->format('M d, Y'),
+                ];
+            }
+        } else {
+            $dayEarning = $dailyRate;
+        }
+
+
 
         // Apply late check-in deductions
         if (($attendance->late_minutes ?? 0) > 0) {

@@ -325,9 +325,9 @@
     <!-- Script for Face API (Local) -->
     <script src="{{ asset('vendor/face-api/face-api.min.js') }}"></script>
 
-    <div class="main-content">
-        <div class="main-content-inner">
-            <div class="my-attendance">
+    <div class="container py-4">
+        <div class="my-attendance">
+
                 <!-- Status & Feedback Container -->
                 <div id="statusContainer" class="d-none mb-4 text-center">
                     <div class="status-pill d-inline-block px-4 py-2 rounded-pill bg-white shadow-sm border">
@@ -415,10 +415,10 @@
                             </div>
                         </div>
                     @endif
-                </div>
             </div>
         </div>
     </div>
+
 
     <!-- Camera Modal with AI Features -->
     <div class="camera-modal" id="cameraModal">
@@ -459,7 +459,6 @@
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
         let currentType = 'check_in';
         let stream = null;
