@@ -3,8 +3,6 @@
 @section('content')
     @include('hr.partials.hr-styles')
 
-    <div class="main-content">
-        <div class="main-content-inner">
             <div class="container">
                 <!-- Page Header -->
                 <div class="page-header d-flex justify-content-between align-items-start">
@@ -121,10 +119,7 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Modal -->
     <div class="modal fade" id="departmentModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -160,9 +155,8 @@
                         </button>
                     </div>
                 </form>
-            </div>
-        </div>
-    </div>
+                        </div>
+@endsection
 
 @section('scripts')
     <script>
@@ -230,3 +224,4 @@
         });
     </script>
 @endsection
+

@@ -3,8 +3,6 @@
 @section('content')
     @include('hr.partials.hr-styles')
 
-    <div class="main-content">
-        <div class="main-content-inner">
             <div class="container">
                 <!-- Page Header -->
                 <div class="page-header d-flex justify-content-between align-items-start">
@@ -469,8 +467,6 @@
                     </div>
                 </form>
             </div>
-        </div>
-    </div>
 @endsection
 
 @section('scripts')
@@ -1077,3 +1073,4 @@
     </div>
     <!-- End Face Logic -->
 @endsection
+

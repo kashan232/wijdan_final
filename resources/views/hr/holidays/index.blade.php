@@ -71,8 +71,6 @@
         }
     </style>
 
-    <div class="main-content">
-        <div class="main-content-inner">
             <div class="container">
                 <!-- Page Header -->
                 <div class="page-header d-flex justify-content-between align-items-start">
@@ -199,10 +197,10 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+@endsection
 
-    <!-- Modal -->
+@section('scripts')
+
     <div class="modal fade" id="holidayModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -639,3 +637,4 @@
         });
     </script>
 @endsection
+

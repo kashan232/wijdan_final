@@ -225,8 +225,6 @@
         }
     </style>
 
-    <div class="main-content">
-        <div class="main-content-inner">
             <div class="container">
                 <!-- Page Header -->
                 <div class="page-header d-flex justify-content-between align-items-start">
@@ -692,9 +690,6 @@
                     @endcan
                 </form>
             </div>
-        </div>
-    </div>
-
 @endsection
 
 @section('scripts')
@@ -944,3 +939,4 @@
         });
     </script>
 @endsection
+

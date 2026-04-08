@@ -590,10 +590,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-
+                        </div>
 @endsection
 
 @section('scripts')
@@ -861,3 +858,4 @@ function viewLoanDetails(id) {
 }
 </script>
 @endsection
+
