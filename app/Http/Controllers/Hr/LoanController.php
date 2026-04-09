@@ -92,7 +92,10 @@ class LoanController extends Controller
             'paid_amount'        => 0,
         ]);
 
-        return response()->json(['success' => 'Loan request submitted successfully.', 'reload' => true]);
+        return response()->json([
+            'success' => "💰 <b>Request Submitted!</b><br>Loan application for <b>{$request->amount}</b> has been received and is pending approval.",
+            'reload' => true
+        ]);
     }
 
     // ──────────────────────────────────────────
@@ -154,7 +157,10 @@ class LoanController extends Controller
             'notes'              => $request->notes,
         ]);
 
-        return response()->json(['success' => 'Loan request updated successfully.', 'reload' => true]);
+        return response()->json([
+            'success' => "🔄 <b>Loan Updated!</b><br>Changes to the loan request have been saved successfully.",
+            'reload' => true
+        ]);
     }
 
 
@@ -204,7 +210,10 @@ class LoanController extends Controller
             'approved_by' => auth()->id(),
         ]);
 
-        return response()->json(['success' => 'Loan approved successfully.', 'reload' => true]);
+        return response()->json([
+            'success' => "✅ <b>Loan Approved!</b><br>The loan for <b>{$loan->employee->full_name}</b> has been approved.",
+            'reload' => true
+        ]);
     }
 
     public function reject($id)
@@ -212,7 +221,10 @@ class LoanController extends Controller
         $loan = Loan::findOrFail($id);
         $loan->update(['status' => 'rejected']);
 
-        return response()->json(['success' => 'Loan rejected.', 'reload' => true]);
+        return response()->json([
+            'success' => "❌ <b>Loan Rejected!</b><br>The loan request has been declined.",
+            'reload' => true
+        ]);
     }
 
     // ──────────────────────────────────────────
@@ -258,7 +270,10 @@ class LoanController extends Controller
             $loan->update(['status' => 'paid']);
         }
 
-        return response()->json(['success' => 'Payment of Rs. ' . number_format($amount, 2) . ' recorded.', 'reload' => true]);
+        return response()->json([
+            'success' => "💸 <b>Payment Recorded!</b><br>A payment of <b>Rs. " . number_format($amount, 2) . "</b> has been credited to this loan.",
+            'reload' => true
+        ]);
     }
 
     // ──────────────────────────────────────────
@@ -268,7 +283,10 @@ class LoanController extends Controller
     public function destroy($id)
     {
         Loan::findOrFail($id)->delete();
-        return response()->json(['success' => 'Loan deleted successfully.', 'reload' => true]);
+        return response()->json([
+            'success' => "🗑️ <b>Loan Deleted!</b><br>The loan record and its history have been removed.",
+            'reload' => true
+        ]);
     }
 
     // ──────────────────────────────────────────
@@ -301,7 +319,10 @@ class LoanController extends Controller
             'notes'           => $request->notes,
         ]);
 
-        return response()->json(['success' => 'Deduction scheduled for ' . $request->month . '.', 'reload' => true]);
+        return response()->json([
+            'success' => "📅 <b>Deduction Scheduled!</b><br>A one-off deduction of <b>Rs. " . number_format($request->amount, 2) . "</b> has been scheduled for <b>" . $request->month . "</b>.",
+            'reload' => true
+        ]);
     }
 
     // ──────────────────────────────────────────

@@ -37,7 +37,7 @@ class DepartmentController extends Controller
             $department->update($request->all());
 
             return response()->json([
-                'success' => 'Department Updated Successfully',
+                'success' => "🏢 <b>Updated!</b><br>Department <b>'{$request->name}'</b> has been updated successfully.",
                 'reload' => true,
             ]);
         } else {
@@ -47,7 +47,7 @@ class DepartmentController extends Controller
             Department::create($request->all());
 
             return response()->json([
-                'success' => 'Department Created Successfully',
+                'success' => "🏢 <b>Success!</b><br>New department <b>'{$request->name}'</b> has been created.",
                 'reload' => true,
             ]);
         }
@@ -66,7 +66,7 @@ class DepartmentController extends Controller
         $department->delete();
 
         return response()->json([
-            'success' => 'Department Deleted Successfully',
+            'success' => "🗑️ <b>Deleted!</b><br>Department <b>'{$department->name}'</b> has been removed.",
             'reload' => true,
         ]);
     }

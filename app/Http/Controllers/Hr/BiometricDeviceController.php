@@ -57,14 +57,14 @@ class BiometricDeviceController extends Controller
 
         if ($testResult['success']) {
             return response()->json([
-                'success' => 'Device added and connection verified successfully!',
+                'success' => "📠 <b>Device Added!</b><br>Biometric device <b>'{$device->name}'</b> joined and connection verified.",
                 'reload' => true,
             ]);
         } else {
             // Return as 200 but with warning message in success (since device IS created)
             // Or ideally we should probably use a warning type, but for now success with detailed msg
             return response()->json([
-                'success' => 'Device added but connection failed: ' . $testResult['message'],
+                'success' => "⚠️ <b>Warning!</b><br>Device <b>'{$device->name}'</b> was added, but we couldn't connect: " . $testResult['message'],
                 'reload' => true,
             ]);
         }
@@ -96,7 +96,7 @@ class BiometricDeviceController extends Controller
         $device->update($validated);
 
         return response()->json([
-            'success' => 'Device updated successfully!',
+            'success' => "⚙️ <b>Updated!</b><br>Device settings for <b>'{$device->name}'</b> have been saved.",
             'reload' => true,
         ]);
     }
@@ -109,7 +109,7 @@ class BiometricDeviceController extends Controller
         $device->delete();
 
         return response()->json([
-            'success' => 'Device deleted successfully!',
+            'success' => "🗑️ <b>Removed!</b><br>Device <b>'{$device->name}'</b> has been deleted.",
             'reload' => true,
         ]);
     }
@@ -163,7 +163,7 @@ class BiometricDeviceController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Attendance sync started in background. You will be notified when completed.',
+            'message' => "⏳ <b>Sync Started!</b><br>Attendance data is being pulled from <b>{$device->name}</b> in the background.",
         ]);
     }
 
@@ -176,7 +176,7 @@ class BiometricDeviceController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Employee sync started in background. You will be notified when completed.',
+            'message' => "⏳ <b>Employee Sync Started!</b><br>Uploading data to <b>{$device->name}</b>. This will complete in the background.",
         ]);
     }
 }

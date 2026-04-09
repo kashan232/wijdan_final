@@ -46,13 +46,13 @@ class ShiftController extends Controller
             }
             $shift = Shift::findOrFail($request->edit_id);
             $shift->update($request->all());
-            $message = 'Shift Updated Successfully';
+            $message = "🕒 <b>Updated!</b><br>Shift schedule <b>'{$request->name}'</b> has been updated successfully.";
         } else {
             if (! auth()->user()->can('hr.shifts.create')) {
                 return response()->json(['error' => 'Unauthorized action.'], 403);
             }
             Shift::create($request->all());
-            $message = 'Shift Created Successfully';
+            $message = "🕒 <b>Success!</b><br>New work shift <b>'{$request->name}'</b> has been created.";
         }
 
         return response()->json(['success' => $message, 'reload' => true]);
@@ -74,7 +74,7 @@ class ShiftController extends Controller
 
         $shift->delete();
 
-        return response()->json(['success' => 'Shift Deleted Successfully', 'reload' => true]);
+        return response()->json(['success' => "🗑️ <b>Deleted!</b><br>Shift <b>'{$shift->name}'</b> has been removed.", 'reload' => true]);
     }
 
     /**
@@ -97,6 +97,6 @@ class ShiftController extends Controller
             $results[] = "Device {$device->name}: ".$res['message'];
         }
 
-        return response()->json(['success' => 'Sync completed. '.implode(' | ', $results)]);
+        return response()->json(['success' => "🔄 <b>Sync Completed!</b><br>Shifts have been synchronized across " . $devices->count() . " devices.<br><small>" . implode('<br>', $results) . "</small>"]);
     }
 }

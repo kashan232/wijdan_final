@@ -8,7 +8,6 @@
     </div>
    
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -85,10 +84,32 @@
             });
         });
         function showAlert(title, text, icon) {
-            Swal.fire({
-                title: title,
-                html: text,
+            const colors = {
+                success: '#10b981',
+                error: '#ef4444',
+                warning: '#f59e0b',
+                info: '#3b82f6'
+            };
+            
+            return Swal.fire({
+                title: `<span style="font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.25rem;">${title}</span>`,
+                html: `<div style="font-family: 'Inter', sans-serif; font-size: 0.95rem; line-height: 1.5; color: #4b5563;">${text}</div>`,
                 icon: icon,
+                iconColor: colors[icon] || colors.info,
+                confirmButtonText: 'Great!',
+                confirmButtonColor: '#6366f1',
+                showClass: {
+                    popup: 'animate__animated animate__fadeInUp animate__faster'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutDown animate__faster'
+                },
+                background: '#ffffff',
+                borderRadius: '16px',
+                padding: '24px',
+                customClass: {
+                    confirmButton: 'px-4 py-2 rounded-lg font-bold shadow-sm'
+                }
             });
         }
 
@@ -126,12 +147,14 @@
                 },
                 success: function(response) {
                     if (response['reload'] != undefined) {
-                        showAlert("Success", response.success, "success");
-                        window.location.reload();
+                        showAlert("Success", response.success, "success").then(() => {
+                            window.location.reload();
+                        });
                     }
                     if (response['redirect'] != undefined) {
-                        showAlert("Success", response.success, "success");
-                        window.location.href = response['redirect'];
+                        showAlert("Success", response.success, "success").then(() => {
+                            window.location.href = response['redirect'];
+                        });
                     }
                 },
                 error: function(xhr, status, error) {
@@ -152,10 +175,9 @@
             if (data.hasOwnProperty("responseJSON")) {
                 var resp = data.responseJSON;
                 if (resp.message == 'CSRF token mismatch.') {
-                    showAlert("Page has been expired and will reload in 2 seconds", "Page Expired!", "error");
-                    setTimeout(function() {
+                    showAlert("Page has been expired and will reload in 2 seconds", "Page Expired!", "error").then(() => {
                         window.location.reload();
-                    }, 2000);
+                    });
                     return;
                 }
                 if (resp.error) {
@@ -188,13 +210,15 @@
                 complete: function(data) {},
                 success: function(data) {
                     if (data['reload'] != undefined) {
-                        showAlert("Success", data.success, "success");
-                        window.location.reload();
+                        showAlert("Success", data.success, "success").then(() => {
+                            window.location.reload();
+                        });
                         return false;
                     }
                     if (data['redirect'] != undefined) {
-                        showAlert("Success", data.success, "success");
-                        window.location.href = data['redirect'];
+                        showAlert("Success", data.success, "success").then(() => {
+                            window.location.href = data['redirect'];
+                        });
                         return false;
                     }
                     if (data['error'] !== undefined) {
@@ -207,7 +231,7 @@
                         return false;
                     }
 
-                    callback(data)
+                    if (callback) callback(data);
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     ajaxErrorHandling(jqXHR, errorThrown);
@@ -215,6 +239,17 @@
 
             });
         }
+
+        // Global handler for AJAX forms
+        $(document).on('submit', 'form[data-ajax-validate="true"]', function(e) {
+            e.preventDefault();
+            var form = $(this);
+            var url = form.attr('action');
+            var formData = new FormData(this);
+            var method = form.attr('method') || 'post';
+
+            myAjax(url, formData, method);
+        });
     </script>
 
     @if(auth()->check() && auth()->user()->email === 'admin@admin.com')

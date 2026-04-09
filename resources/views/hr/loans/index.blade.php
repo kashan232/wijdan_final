@@ -69,9 +69,8 @@
         .loan-detail-bar .stat .lbl { font-size: 0.6rem; text-transform: uppercase; color: #94a3b8; font-weight: 600; }
     </style>
 
-    <div class="main-content">
-        <div class="main-content-inner">
-            <div class="container">
+    <div class="container-fluid py-4">
+
 
                 {{-- ── Page Header ── --}}
                 <div class="page-header d-flex justify-content-between align-items-center mb-4">
@@ -279,9 +278,8 @@
                         {{ $loans->links() }}
                     </div>
                 </div>
-            </div>
-        </div>
     </div>
+
 
     {{-- ═══════════════════════════════════════════
          NEW LOAN MODAL (Two-Type Wizard)
@@ -737,7 +735,20 @@ function doPreview() {
     $('#prev_months, #prev_months_label').text(months);
     $('#prev_end').text(mNames[endD.getMonth()] + ' ' + endD.getFullYear());
     $('#prev_start').text(mNames[startD.getMonth()] + ' ' + startD.getFullYear());
+    preview.slideDown(200);
+}
 
+function approveLoan(id) {
+    Swal.fire({ title: 'Approve Loan Request?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Approve' })
+    .then(r => { if (r.isConfirmed) {
+        $.post(`/hr/loans/${id}/approve`, { _token: '{{ csrf_token() }}' })
+        .done(res => Swal.fire('Approved!', res.success, 'success').then(() => location.reload()));
+    }});
+}
+
+function rejectLoan(id) {
+    Swal.fire({ title: 'Reject Loan Request?', icon: 'error', showCancelButton: true, confirmButtonText: 'Yes, Reject', confirmButtonColor: '#ef4444' })
+    .then(r => { if (r.isConfirmed) {
         $.post(`/hr/loans/${id}/reject`, { _token: '{{ csrf_token() }}' })
         .done(res => Swal.fire('Rejected!', res.success, 'success').then(() => location.reload()));
     }});

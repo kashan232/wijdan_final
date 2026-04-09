@@ -71,7 +71,12 @@
         }
     </style>
 
+<<<<<<< HEAD
             <div class="container">
+=======
+    <div class="container-fluid py-4">
+
+>>>>>>> 7c7382d27752e695ce8bfd60d4bd901dfbb8275f
                 <!-- Page Header -->
                 <div class="page-header d-flex justify-content-between align-items-start">
                     <div>
@@ -196,11 +201,18 @@
                         {{ $holidays->links() }}
                     </div>
                 </div>
+<<<<<<< HEAD
             </div>
 @endsection
 
 @section('scripts')
 
+=======
+    </div>
+
+
+    <!-- Modal -->
+>>>>>>> 7c7382d27752e695ce8bfd60d4bd901dfbb8275f
     <div class="modal fade" id="holidayModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -364,7 +376,10 @@
         </div>
     </div>
 
+@endsection
+
 @section('scripts')
+
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>

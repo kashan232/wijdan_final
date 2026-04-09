@@ -81,7 +81,7 @@ class HolidayController extends Controller
                 $this->hrCache->clearHolidaysCache($newEndYear);
             }
 
-            $message = 'Holiday Updated Successfully';
+            $message = "📅 <b>Updated!</b><br>Holiday <b>'{$request->name}'</b> has been updated successfully.";
         } else {
             if (! auth()->user()->can('hr.holidays.create')) {
                 return response()->json(['error' => 'Unauthorized action.'], 403);
@@ -101,7 +101,7 @@ class HolidayController extends Controller
                 $this->hrCache->clearHolidaysCache($endYear);
             }
 
-            $message = 'Holiday Created Successfully';
+            $message = "📅 <b>Success!</b><br>New holiday <b>'{$request->name}'</b> has been added to the calendar.";
         }
 
         return response()->json(['success' => $message, 'reload' => true]);
@@ -128,7 +128,7 @@ class HolidayController extends Controller
             $holiday->employees()->sync([]);
         }
 
-        return response()->json(['success' => 'Employees assigned successfully.', 'reload' => true]);
+        return response()->json(['success' => "👥 <b>Assigned!</b><br>Employees have been successfully assigned to this holiday.", 'reload' => true]);
     }
 
     public function destroy($id)
@@ -146,7 +146,7 @@ class HolidayController extends Controller
         // Clear cache
         $this->hrCache->clearHolidaysCache($year);
 
-        return response()->json(['success' => 'Holiday Deleted Successfully', 'reload' => true]);
+        return response()->json(['success' => "🗑️ <b>Deleted!</b><br>Holiday <b>'{$holiday->name}'</b> has been removed.", 'reload' => true]);
     }
 
     /**
