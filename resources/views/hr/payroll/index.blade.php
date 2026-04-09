@@ -2591,9 +2591,4 @@
             });
         });
     </script>
-<<<<<<< HEAD
 @endsection
-
-=======
-@endsection
->>>>>>> 7c7382d27752e695ce8bfd60d4bd901dfbb8275f
